@@ -1,0 +1,16 @@
+@use 'vuetify/settings' with (
+    $body-font-family: ('Barlow', sans-serif),
+    $heading-font-family: ('Barlow Condensed', sans-serif)
+);
+
+@import '@fontsource/barlow/index.css';
+@import '@fontsource/barlow-condensed/index.css';
+
+.barlow {
+    font-family: 'Barlow', sans-serif !important;
+}
+
+.barlow-condensed {
+    font-family: 'Barlow Condensed', sans-serif !important;
+}
+
