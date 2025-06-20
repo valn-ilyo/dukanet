@@ -6,12 +6,15 @@ import { useNotifier } from '@/composables/useNotifier'
 const { notify } = useNotifier()
 const route = useRoute()
 
+if (route.query.next) {
+  localStorage.setItem('postAuthRedirect', route.query.next as string)
+}
+
 const loginWithGoogle = async () => {
-  const nextUrl = (route.query.next as string) || '/'
   const { error } = await supabase.auth.signInWithOAuth({
     provider: 'google',
     options: {
-      redirectTo: `${window.location.origin}/#${nextUrl}`,
+      redirectTo: `${window.location.origin}`,
     },
   })
 
@@ -20,11 +23,7 @@ const loginWithGoogle = async () => {
 </script>
 
 <template>
-  <v-sheet
-    :max-width="400"
-    color="background"
-    class="d-flex flex-column align-center justify-center"
-  >
+  <v-container :max-width="400" class="d-flex flex-column align-center justify-center">
     <v-card-title class="text-h4 text-wrap text-center font-weight-bold text-onBackground">
       Buy and Sell Locally,<br />Closer Than Ever
     </v-card-title>
@@ -76,7 +75,7 @@ const loginWithGoogle = async () => {
         </template>
       </v-btn>
     </v-card-actions>
-  </v-sheet>
+  </v-container>
 </template>
 
 <style scoped>

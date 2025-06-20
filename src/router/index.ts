@@ -98,6 +98,11 @@ const router = createRouter({
         },
       ],
     },
+    {
+      path: '/:pathMatch(.*)*',
+      name: 'not-found',
+      component: () => import('@/views/404View.vue'),
+    },
   ],
 })
 
@@ -105,18 +110,27 @@ router.beforeEach(async (to, from, next) => {
   const {
     data: { session },
   } = await supabase.auth.getSession()
-  const isLoggedIn = !!session
 
   const geolocationStore = useGeolocationStore()
+  const isLoggedIn = !!session
+  const hasGeoAccess = geolocationStore.hasGeolocationAccess
+
+  if (to.name === 'auth' && isLoggedIn) {
+    const fallback = (to.query.next as string) || '/'
+    return next(fallback)
+  }
+
+  if (to.name === 'geolocation' && hasGeoAccess) {
+    const fallback = (to.query.next as string) || '/'
+    return next(fallback)
+  }
 
   if (to.meta.requiresAuth && !isLoggedIn) {
     return next({ name: 'auth', query: { next: to.fullPath } })
   }
 
-  if (to.meta.requiresGeolocation) {
-    if (!geolocationStore.hasGeolocationAccess) {
-      return next({ name: 'geolocation', query: { next: to.fullPath } })
-    }
+  if (to.meta.requiresGeolocation && !hasGeoAccess) {
+    return next({ name: 'geolocation', query: { next: to.fullPath } })
   }
 
   return next()

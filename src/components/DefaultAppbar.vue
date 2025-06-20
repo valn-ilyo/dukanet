@@ -4,7 +4,7 @@ import { useRouter } from 'vue-router'
 import { supabase } from '@/lib/supabaseClient'
 import { useUserInfo } from '@/composables/useUserInfo'
 import { useNotifier } from '@/composables/useNotifier'
-import logo from '@/components/icons/dukanet-logo.vue'
+import logo from '@/components/icons/dukanet-icon.vue'
 
 const { avatarUrl, email, fullName } = useUserInfo()
 const { notify } = useNotifier()
@@ -74,6 +74,7 @@ const logout = async () => {
           block
           @click="logout"
           :loading="loggingOut"
+          :disabled="loggingOut"
         />
       </v-sheet>
     </v-sheet>

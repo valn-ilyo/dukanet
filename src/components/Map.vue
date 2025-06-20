@@ -1,59 +1,98 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { Loader } from '@googlemaps/js-api-loader'
+import { useGeolocationStore } from '@/stores/geolocation'
+import { storeToRefs } from 'pinia'
+import { useNotifier } from '@/composables/useNotifier'
 
-const props = defineProps({
-  latitude: {
-    type: Number,
-    required: true,
-  },
-  longitude: {
-    type: Number,
-    required: true,
-  },
-  title: {
-    type: String,
-    default: 'Location',
-  },
-})
+const { coords } = storeToRefs(useGeolocationStore())
+const { notify } = useNotifier()
 
 const mapDiv = ref<HTMLDivElement | null>(null)
+let map: google.maps.Map
+let marker: google.maps.marker.AdvancedMarkerElement
+let infoWindow: google.maps.InfoWindow
+
+const loading = ref(false)
 
 onMounted(async () => {
-  const loader = new Loader({
-    apiKey: import.meta.env.VITE_GOOGLE_MAP_API_KEY as string,
-    libraries: ['marker'],
-  })
+  try {
+    const loader = new Loader({
+      apiKey: import.meta.env.VITE_GOOGLE_MAP_API_KEY,
+      libraries: ['marker'],
+    })
 
-  const { Map } = await loader.importLibrary('maps')
-  const { AdvancedMarkerElement } = await loader.importLibrary('marker')
+    const [{ Map, InfoWindow }, { AdvancedMarkerElement }] = await Promise.all([
+      loader.importLibrary('maps'),
+      loader.importLibrary('marker'),
+    ])
 
-  const position: google.maps.LatLngLiteral = {
-    lat: props.latitude,
-    lng: props.longitude,
-  }
+    const position = { lat: coords.value.latitude, lng: coords.value.longitude }
 
-  if (mapDiv.value) {
-    const map = new Map(mapDiv.value, {
+    if (!mapDiv.value) throw new Error('Map display area not found.')
+
+    map = new Map(mapDiv.value, {
       center: position,
-      zoom: 16,
-      mapId: import.meta.env.VITE_GOOGLE_MAP_ID as string,
-      disableDefaultUI: true,
+      zoom: 18,
+      mapId: import.meta.env.VITE_GOOGLE_MAP_ID,
     })
 
-    new AdvancedMarkerElement({
+    marker = new AdvancedMarkerElement({
       map,
-      position: position,
-      title: props.title,
+      position,
+      title: 'Your Business Location',
     })
-  } else {
-    console.error('Map div element not found.')
+
+    infoWindow = new InfoWindow({
+      // Change the content to an HTML string
+      content: `<div style="padding-bottom: 15px; padding-right: 15px;"> Your Business Location   </div>`,
+    })
+
+    marker.addListener('click', () => {
+      infoWindow.open(map, marker)
+    })
+
+    infoWindow.open(map, marker)
+  } catch (err) {
+    notify({
+      message: (err as Error).message || 'Failed to load the map. Please try again.',
+      color: 'error',
+    })
   }
 })
+
+const repositionMarker = () => {
+  loading.value = true
+
+  const { latitude: lat, longitude: lng } = coords.value
+  const pos = { lat, lng }
+
+  marker.position = pos
+  map.setCenter(pos)
+  map.setZoom(18)
+
+  if (infoWindow) {
+    infoWindow.setPosition(pos)
+    infoWindow.open(map, marker)
+  }
+
+  loading.value = false
+}
 </script>
 
 <template>
   <div>
-    <div ref="mapDiv" style="height: 50vh; width: 100%" />
+    <div ref="mapDiv" style="width: 100%; aspect-ratio: 1 / 1" />
+    <v-btn
+      text="Update Pin to My Location"
+      class="text-none rounded-0 mb-4"
+      color="error"
+      elevation="0"
+      prepend-icon="mdi-crosshairs-gps"
+      block
+      @click="repositionMarker"
+      :loading="loading"
+      :disabled="loading"
+    />
   </div>
 </template>

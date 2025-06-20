@@ -20,19 +20,15 @@ watch(hasGeolocationAccess, (newValue) => {
 </script>
 
 <template>
-  <v-sheet
-    :max-width="400"
-    color="background"
-    class="d-flex flex-column align-center justify-center"
-  >
+  <v-container :max-width="400" class="d-flex flex-column align-center justify-center">
     <v-card-title class="text-h4 text-wrap text-center font-weight-bold text-onBackground">
       Unlock Your Local Hub
     </v-card-title>
 
     <v-card-subtitle class="pb-4 text-subtitle-2 text-wrap text-center text-onBackground">
       For the best local experience, please enable
-      <span class="font-weight-bold">geolocation permission</span>. It's how we help you easily find
-      and connect with your nearby community!
+      <span class="font-weight-bold text-onSurface">geolocation permission</span>. It's how we help
+      you easily find and connect with your nearby community!
     </v-card-subtitle>
 
     <v-alert :type="hasGeolocationAccess === false ? 'warning' : 'info'" variant="tonal">
@@ -41,7 +37,7 @@ watch(hasGeolocationAccess, (newValue) => {
       </span>
 
       <span v-else>
-        <span v-if="hasGeolocationAccess === true">Redirecting you</span>
+        <span v-if="hasGeolocationAccess === true">Redirecting you </span>
         <span v-else>Attempting to locate you </span>
         <span
           v-motion
@@ -93,7 +89,7 @@ watch(hasGeolocationAccess, (newValue) => {
         >
       </span>
     </v-alert>
-  </v-sheet>
+  </v-container>
 </template>
 
 <style scoped>
