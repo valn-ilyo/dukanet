@@ -45,13 +45,13 @@ const logout = async () => {
 
       <div class="text-h6 barlow pa-2 text-onSurfaceVariant">Hi, {{ firstName }}!</div>
 
-      <v-sheet color="surface" class="rounded-xl">
+      <v-container>
         <v-btn
           prepend-icon="mdi-storefront-outline"
           text="Add your business"
-          class="text-none justify-start rounded-t-xl"
-          color="onSurface"
-          variant="text"
+          class="text-none justify-start rounded-t-xl rounded-b-0"
+          color="surface"
+          variant="flat"
           block
           to="/business"
         />
@@ -59,24 +59,24 @@ const logout = async () => {
         <v-btn
           prepend-icon="mdi-bookmark-outline"
           text="Your saved items"
-          class="text-none justify-start"
-          color="onSurface"
-          variant="text"
+          class="text-none justify-start rounded-0"
+          color="surface"
+          variant="flat"
           block
         />
         <v-divider></v-divider>
         <v-btn
           prepend-icon="mdi-logout"
           text="Logout"
-          class="text-none justify-start rounded-b-xl"
-          color="onSurface"
-          variant="text"
+          class="text-none justify-start rounded-b-xl rounded-t-0"
+          color="surface"
+          variant="flat"
           block
           @click="logout"
           :loading="loggingOut"
           :disabled="loggingOut"
         />
-      </v-sheet>
+      </v-container>
     </v-sheet>
   </v-navigation-drawer>
 
