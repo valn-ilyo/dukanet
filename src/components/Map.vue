@@ -44,8 +44,7 @@ onMounted(async () => {
     })
 
     infoWindow = new InfoWindow({
-      // Change the content to an HTML string
-      content: `<div style="padding-bottom: 15px; padding-right: 15px;"> Your Business Location   </div>`,
+      content: 'Your Business Location',
     })
 
     marker.addListener('click', () => {
