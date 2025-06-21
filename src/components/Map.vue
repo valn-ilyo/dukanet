@@ -15,6 +15,10 @@ let infoWindow: google.maps.InfoWindow
 
 const loading = ref(false)
 
+const emit = defineEmits<{
+  (e: 'update:location', payload: { lat: number; lng: number }): void
+}>()
+
 onMounted(async () => {
   try {
     const loader = new Loader({
@@ -27,19 +31,19 @@ onMounted(async () => {
       loader.importLibrary('marker'),
     ])
 
-    const position = { lat: coords.value.latitude, lng: coords.value.longitude }
+    const initialPosition = { lat: coords.value.latitude, lng: coords.value.longitude }
 
     if (!mapDiv.value) throw new Error('Map display area not found.')
 
     map = new Map(mapDiv.value, {
-      center: position,
+      center: initialPosition,
       zoom: 18,
       mapId: import.meta.env.VITE_GOOGLE_MAP_ID,
     })
 
     marker = new AdvancedMarkerElement({
       map,
-      position,
+      position: initialPosition,
       title: 'Your Business Location',
     })
 
@@ -52,6 +56,8 @@ onMounted(async () => {
     })
 
     infoWindow.open(map, marker)
+
+    emit('update:location', initialPosition)
   } catch (err) {
     notify({
       message: (err as Error).message || 'Failed to load the map. Please try again.',
@@ -64,16 +70,18 @@ const repositionMarker = () => {
   loading.value = true
 
   const { latitude: lat, longitude: lng } = coords.value
-  const pos = { lat, lng }
+  const newPosition = { lat, lng }
 
-  marker.position = pos
-  map.setCenter(pos)
+  marker.position = newPosition
+  map.setCenter(newPosition)
   map.setZoom(18)
 
   if (infoWindow) {
-    infoWindow.setPosition(pos)
+    infoWindow.setPosition(newPosition)
     infoWindow.open(map, marker)
   }
+
+  emit('update:location', newPosition)
 
   loading.value = false
 }
@@ -84,7 +92,7 @@ const repositionMarker = () => {
     <div ref="mapDiv" style="width: 100%; aspect-ratio: 1 / 1" />
     <v-btn
       text="Update Pin to My Location"
-      class="text-none rounded-0 mb-4"
+      class="text-none rounded-0"
       color="error"
       elevation="0"
       prepend-icon="mdi-crosshairs-gps"

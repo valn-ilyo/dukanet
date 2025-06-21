@@ -35,50 +35,7 @@ const router = createRouter({
         { path: '', redirect: '/business/create-profile' },
         {
           path: 'create-profile',
-          component: () => import('@/layouts/BusinessCreateProfileLayout.vue'),
-          children: [
-            { path: '', redirect: { name: 'Step 1' } },
-            {
-              path: 'step-1',
-              name: 'Step 1',
-              component: () => import('@/views/CreateProfileStep1View.vue'),
-              meta: {
-                progress: 25,
-                nextRoute: { name: 'Step 2' },
-                prevRoute: { name: 'home' },
-              },
-            },
-            {
-              path: 'step-2',
-              name: 'Step 2',
-              component: () => import('@/views/CreateProfileStep2View.vue'),
-              meta: {
-                progress: 50,
-                prevRoute: { name: 'Step 1' },
-                nextRoute: { name: 'Step 3' },
-              },
-            },
-            {
-              path: 'step-3',
-              name: 'Step 3',
-              component: () => import('@/views/CreateProfileStep3View.vue'),
-              meta: {
-                progress: 75,
-                prevRoute: { name: 'Step 2' },
-                nextRoute: { name: 'Step 4' },
-              },
-            },
-            {
-              path: 'step-4',
-              name: 'Step 4',
-              component: () => import('@/views/CreateProfileStep4View.vue'),
-              meta: {
-                progress: 100,
-                prevRoute: { name: 'Step 3' },
-                nextRoute: { name: 'home' },
-              },
-            },
-          ],
+          component: () => import('@/views/BusinessAddView.vue'),
         },
       ],
     },
@@ -115,12 +72,7 @@ router.beforeEach(async (to, from, next) => {
   const isLoggedIn = !!session
   const hasGeoAccess = geolocationStore.hasGeolocationAccess
 
-  if (to.name === 'auth' && isLoggedIn) {
-    const fallback = (to.query.next as string) || '/'
-    return next(fallback)
-  }
-
-  if (to.name === 'geolocation' && hasGeoAccess) {
+  if ((to.name === 'auth' && isLoggedIn) || (to.name === 'geolocation' && hasGeoAccess)) {
     const fallback = (to.query.next as string) || '/'
     return next(fallback)
   }

@@ -1,5 +1,13 @@
 <script setup lang="ts">
 import Map from '@/components/Map.vue'
+
+const emit = defineEmits<{
+  (e: 'update:location', location: { lat: number; lng: number }): void
+}>()
+
+function forwardLocation(location: { lat: number; lng: number }) {
+  emit('update:location', location)
+}
 </script>
 
 <template>
@@ -14,5 +22,5 @@ import Map from '@/components/Map.vue'
     again.
   </div>
 
-  <Map class="mb-4" />
+  <Map @update:location="forwardLocation" />
 </template>
