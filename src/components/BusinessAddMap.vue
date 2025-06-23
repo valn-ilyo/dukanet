@@ -33,18 +33,26 @@ onMounted(async () => {
 
     const initialPosition = { lat: coords.value.latitude, lng: coords.value.longitude }
 
+    // Guard against cases where initial geolocation might be invalid
+    if (isNaN(initialPosition.lat) || isNaN(initialPosition.lng)) {
+      throw new Error('Initial geolocation not available or invalid. Please ensure location services are enabled.')
+    }
+
     if (!mapDiv.value) throw new Error('Map display area not found.')
 
     map = new Map(mapDiv.value, {
       center: initialPosition,
       zoom: 18,
       mapId: import.meta.env.VITE_GOOGLE_MAP_ID,
+      disableDefaultUI: true,
+      zoomControl: true,
     })
 
     marker = new AdvancedMarkerElement({
       map,
       position: initialPosition,
       title: 'Your Business Location',
+      gmpDraggable: true,
     })
 
     infoWindow = new InfoWindow({
@@ -55,9 +63,26 @@ onMounted(async () => {
       infoWindow.open(map, marker)
     })
 
-    infoWindow.open(map, marker)
+    infoWindow.open(map, marker) // Open info window on initial load
 
     emit('update:location', initialPosition)
+
+    marker.addListener('dragend', (event: google.maps.MapMouseEvent) => {
+      const newLat = event.latLng?.lat()
+      const newLng = event.latLng?.lng()
+
+      if (typeof newLat === 'number' && typeof newLng === 'number') {
+        const newPosition = { lat: newLat, lng: newLng }
+        emit('update:location', newPosition)
+
+        // Update the info window position after drag
+        infoWindow.setPosition(newPosition);
+        infoWindow.open(map, marker);
+      } else {
+        console.error('Could not get new position after marker dragend event.');
+      }
+    })
+
   } catch (err) {
     notify({
       message: (err as Error).message || 'Failed to load the map. Please try again.',
@@ -72,10 +97,21 @@ const repositionMarker = () => {
   const { latitude: lat, longitude: lng } = coords.value
   const newPosition = { lat, lng }
 
+  // Ensure valid coordinates before attempting to move marker/map
+  if (isNaN(lat) || isNaN(lng)) {
+    notify({
+      message: 'Your current location is not available or invalid. Please check device settings.',
+      color: 'warning',
+    })
+    loading.value = false
+    return;
+  }
+
   marker.position = newPosition
   map.setCenter(newPosition)
   map.setZoom(18)
 
+  // Update info window position
   if (infoWindow) {
     infoWindow.setPosition(newPosition)
     infoWindow.open(map, marker)

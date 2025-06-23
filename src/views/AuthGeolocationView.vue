@@ -8,15 +8,15 @@ const route = useRoute()
 const router = useRouter()
 
 const geolocationStore = useGeolocationStore()
-const { hasGeolocationAccess, coords } = storeToRefs(geolocationStore)
+const { hasGeolocationAccess} = storeToRefs(geolocationStore)
 
 const nextUrl = (route.query.next as string) || '/'
 
-watch([coords, hasGeolocationAccess], () => {
+watch([hasGeolocationAccess], () => {
   if (hasGeolocationAccess.value) {
     router.replace(nextUrl)
   }
-})
+}, { immediate: true } )
 </script>
 
 <template>

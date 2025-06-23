@@ -6,6 +6,8 @@ import { createPinia } from 'pinia'
 import { createVuetify } from 'vuetify'
 import piniaPluginPersistedstate from 'pinia-plugin-persistedstate'
 import { MotionPlugin } from '@vueuse/motion'
+import 'vue-advanced-cropper/dist/style.css'
+
 
 import App from './App.vue'
 import router from './router'

@@ -23,7 +23,7 @@ const loginWithGoogle = async () => {
 </script>
 
 <template>
-  <v-container :max-width="400" class="d-flex flex-column align-center justify-center">
+  <v-sheet :max-width="400" class="d-flex flex-column align-center justify-center">
     <v-card-title class="text-h4 text-wrap text-center font-weight-bold text-onBackground">
       Buy and Sell Locally,<br />Closer Than Ever
     </v-card-title>
@@ -75,7 +75,7 @@ const loginWithGoogle = async () => {
         </template>
       </v-btn>
     </v-card-actions>
-  </v-container>
+  </v-sheet>
 </template>
 
 <style scoped>

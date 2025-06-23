@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { Field } from 'vee-validate'
+import { Field} from 'vee-validate'
+
 const states = [
   'Andaman & Nicobar',
   'Andhra Pradesh',
@@ -41,9 +42,9 @@ const states = [
 </script>
 
 <template>
-  <div class="text-h5 mb-4 barlow text-onSurface">Enter your business address</div>
+  <div class="text-h5 mb-4 barlow text-onSurface">Confirm Your Business Address</div>
   <div class="text-subtitle-2 mb-4 barlow text-onSurface">
-    Add a location where customers can visit your business in person
+    Review and edit your full physical address for customers visiting in person.
   </div>
   <Field name="address" v-slot="{ field, errorMessage, value }">
     <v-text-field
@@ -51,7 +52,7 @@ const states = [
       :model-value="value"
       clearable
       color="primary"
-      label="Street Address"
+      label="Street Address*"
       variant="outlined"
       :error="!!errorMessage"
       :error-messages="errorMessage"
@@ -64,7 +65,7 @@ const states = [
       :model-value="value"
       clearable
       color="primary"
-      label="City"
+      label="City*"
       variant="outlined"
       :error="!!errorMessage"
       :error-messages="errorMessage"
@@ -77,7 +78,7 @@ const states = [
       :model-value="value"
       clearable
       color="primary"
-      label="Pincode"
+      label="Pincode*"
       variant="outlined"
       :error="!!errorMessage"
       :error-messages="errorMessage"
@@ -91,7 +92,7 @@ const states = [
       :model-value="value"
       clearable
       color="primary"
-      label="State"
+      label="State*"
       :items="states"
       variant="outlined"
       :error="!!errorMessage"
@@ -99,5 +100,4 @@ const states = [
     />
   </Field>
 </template>
-<!-- This PIN is not recognised. -->
-<!-- This PIN does not appear to match the rest of this address. -->
+

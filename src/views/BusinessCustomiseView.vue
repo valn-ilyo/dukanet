@@ -9,11 +9,11 @@ import { useNotifier } from '@/composables/useNotifier'
 
 const { refreshBusinessStatus } = useUserInfo()
 const { notify } = useNotifier()
-import BusinessAdd1 from '@/components/BusinessAdd1.vue'
-import BusinessAdd2 from '@/components/BusinessAdd2.vue'
-import BusinessAdd3 from '@/components/BusinessAdd3.vue'
-import BusinessAdd4 from '@/components/BusinessAdd4.vue'
-import BusinessAdd5 from '@/components/BusinessAdd5.vue'
+import BusinessCustomise1 from '@/components/BusinessCustomise1.vue'
+import BusinessCustomise2 from '@/components/BusinessCustomise2.vue'
+import BusinessAdd3View from '@/components/BusinessAdd3.vue'
+import BusinessAdd4View from '@/components/BusinessAdd4.vue'
+import BusinessAddSuccess from '@/components/BusinessAdd5.vue'
 
 const inserting = ref(false)
 
@@ -21,7 +21,7 @@ const tab = ref(1)
 const router = useRouter()
 
 const stepFields: string[][] = [
-  ['name', 'handle'],
+  ['logo'],
   ['latitude', 'longitude'],
   ['address', 'city', 'pincode', 'state'],
   ['email', 'contact'],
@@ -31,71 +31,19 @@ const isLastStep = computed(() => tab.value === stepFields.length)
 const formProgress = computed(() => (tab.value / stepFields.length) * 100)
 
 const schema = yup.object({
-  name: yup
-    .string()
-    .required('Tell us your business name! It’s a must-have.')
-    .min(3, 'Your business name should be at least 3 characters long.'),
-  handle: yup
-    .string()
-    .required('A unique handle is essential for your business.')
-    .matches(
-      /^[a-zA-Z0-9_]+$/,
-      'Handles can only contain letters, numbers, and underscores. No spaces or special characters!',
-    )
-    .test(
-      'is-unique',
-      'This handle is already taken. Please choose another one.',
-      async (value) => {
-        if (!value) return true // Let the 'required' rule handle empty values
+  logo: yup
+  .mixed<Blob>()
+  .required('Please upload a logo for your business.')
+  .test('is-blob', 'Invalid logo data.', (blob): blob is Blob =>
+    blob instanceof Blob
+  )
+  .test('is-image', 'Only image files are allowed.', (blob) =>
+    blob?.type?.startsWith('image/')
+  )
+  .test('file-size', 'Image must be less than 2MB.', (blob) =>
+    blob?.size <= 2 * 1024 * 1024
+  ),
 
-        try {
-          const { data, error } = await supabase
-            .from('businesses')
-            .select('handle')
-            .eq('handle', value)
-            .limit(1)
-
-          if (error) {
-            notify({
-              message: `Error checking handle uniqueness: ${error.message}`,
-              color: 'error',
-            })
-            return false
-          }
-
-          return data.length === 0
-        } catch (err) {
-          notify({
-            message: `Unexpected error during handle uniqueness check: ${err}`,
-            color: 'error',
-          })
-          return false
-        }
-      },
-    ),
-
-  latitude: yup.number().required().min(-90).max(90),
-  longitude: yup.number().required().min(-180).max(180),
-
-  address: yup.string().required('Your full address is required so we can locate your business.'),
-  city: yup.string().required('Which city is your business located in? This field is required.'),
-  pincode: yup
-    .string()
-    .required('Please enter your 6-digit PIN code. It’s essential for accurate location.')
-    .matches(
-      /^[1-9][0-9]{5}$/,
-      "That doesn't look like a valid 6-digit Indian PIN code. Please check again.",
-    ),
-  state: yup.string().required("Don't forget to tell us which state your business is in!"),
-
-  email: yup
-    .string()
-    .email('Please enter a valid email address, like "example@domain.com".')
-    .notRequired(),
-  contact: yup
-    .string()
-    .matches(/^[6-9]\d{9}$/, 'Please enter a valid 10-digit Indian mobile number.')
-    .notRequired(),
 })
 
 const { validateField, handleSubmit } = useForm({
@@ -148,18 +96,26 @@ const goBack = () => {
   }
 }
 
+const customise1 = ref<InstanceType<typeof BusinessCustomise1> | null>(null)
+
 const goForward = async () => {
+   if(tab.value==1){
+    await customise1.value?.getResults()
+  }
+
   const fields = stepFields[tab.value - 1]
   const results = await Promise.all(fields.map((field) => validateField(field)))
   const allValid = (results as { valid: boolean }[]).every((r) => r.valid)
 
+ 
+  
   if (allValid) {
     if (isLastStep.value) {
       handleSubmit(onSubmit)()
     } else {
       tab.value++
     }
-  } 
+  }   
 }
 </script>
 
@@ -172,7 +128,7 @@ const goForward = async () => {
 
   <v-main>
     <v-sheet class="mx-4 mb-4">
-      <div v-if="tab !== 5" class="pb-2 text-caption">Create profile</div>
+      <div v-if="tab !== 5" class="pb-2 text-caption">Customise profile</div>
 
       <v-progress-linear
         v-if="tab !== 5"
@@ -183,19 +139,19 @@ const goForward = async () => {
 
       <v-tabs-window v-model="tab" eager>
         <v-tabs-window-item :value="1">
-          <BusinessAdd1 />
+          <BusinessCustomise1 ref="customise1"/>
         </v-tabs-window-item>
         <v-tabs-window-item :value="2">
-          <BusinessAdd2 />
+          <BusinessCustomise2 />
         </v-tabs-window-item>
         <v-tabs-window-item :value="3">
-          <BusinessAdd3 />
+          <BusinessAdd3View />
         </v-tabs-window-item>
         <v-tabs-window-item :value="4">
-          <BusinessAdd4 />
+          <BusinessAdd4View />
         </v-tabs-window-item>
         <v-tabs-window-item :value="5">
-          <BusinessAdd5 />
+          <BusinessAddSuccess />
         </v-tabs-window-item>
       </v-tabs-window>
 

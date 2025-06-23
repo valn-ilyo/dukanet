@@ -32,10 +32,13 @@ const router = createRouter({
       component: () => import('@/layouts/BusinessLayout.vue'),
       meta: { requiresAuth: true, requiresGeolocation: true },
       children: [
-        { path: '', redirect: '/business/create-profile' },
         {
           path: 'create-profile',
           component: () => import('@/views/BusinessAddView.vue'),
+        },
+      {
+          path: 'customize-profile',
+          component: () => import('@/views/BusinessCustomiseView.vue'),
         },
       ],
     },

@@ -6,7 +6,7 @@ import { useUserInfo } from '@/composables/useUserInfo'
 import { useNotifier } from '@/composables/useNotifier'
 import logo from '@/components/icons/dukanet-icon.vue'
 
-const { avatarUrl, email, fullName } = useUserInfo()
+const { avatarUrl, email, fullName, hasBusinessProfile } = useUserInfo()
 const { notify } = useNotifier()
 const router = useRouter()
 
@@ -48,12 +48,13 @@ const logout = async () => {
       <v-container>
         <v-btn
           prepend-icon="mdi-storefront-outline"
-          text="Add your business"
+          :text="hasBusinessProfile? 'Manage your business':'Add your business'"
           class="text-none justify-start rounded-t-xl rounded-b-0"
           color="surface"
           variant="flat"
           block
-          to="/business"
+          :to="hasBusinessProfile? '/business/manage-profile':'/business/create-profile'"
+          :loading="hasBusinessProfile === null"
         />
         <v-divider></v-divider>
         <v-btn

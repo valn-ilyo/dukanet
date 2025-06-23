@@ -14,7 +14,7 @@ import { Field } from 'vee-validate'
       v-bind="field"
       clearable
       color="primary"
-      label="Business name"
+      label="Business name*"
       variant="outlined"
       :error="!!errorMessage"
       :error-messages="errorMessage"
@@ -27,7 +27,7 @@ import { Field } from 'vee-validate'
       prefix="@"
       clearable
       color="primary"
-      label="Unique handle"
+      label="Unique handle*"
       variant="outlined"
       :error="!!errorMessage"
       :error-messages="errorMessage"

@@ -1,7 +1,11 @@
 <script setup lang="ts">
-import { Field } from 'vee-validate'
+import { Field, useField } from 'vee-validate'
 import { useUserInfo } from '@/composables/useUserInfo'
-const { email } = useUserInfo()
+const { email: userEmail } = useUserInfo()
+
+const {value: email} = useField('email')
+
+email.value = userEmail.value
 </script>
 
 <template>
@@ -9,13 +13,13 @@ const { email } = useUserInfo()
     What contact details do you want to show to customers?
   </div>
   <div class="text-subtitle-2 mb-4 barlow text-onSurface">
-    Help customers get in touch by including this info on your listing
+    Help customers get in touch by including this info on your profile
   </div>
 
-  <Field name="email" v-slot="{ field, errorMessage }">
+  <Field name="email" v-slot="{ field, errorMessage, value }">
     <v-text-field
       v-bind="field"
-      :value="email"
+      :model-value="value"
       clearable
       color="primary"
       label="Email"
